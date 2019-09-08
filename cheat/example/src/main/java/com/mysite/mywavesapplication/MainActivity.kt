@@ -96,38 +96,19 @@ class MainActivity : AppCompatActivity() {
            // val eee = Intent(this, Eat::class.java)
             //startActivity(eee)
             //val ee = findViewById<pl.droidsonroids.gif.GifImageView>(R.id.gifImageView)
-            val invoke = InvokeScriptTransaction(
-                dApp = "3N5MStpzr7huB376SNGpMGCMKet8JmwF42e",
-                call = null
-                //payment = mutableListOf(InvokeScriptTransaction.Payment(amount = 10, assetId = WavesConstants.WAVES_ASSET_ID_EMPTY))
-            )
-
-            invoke.fee = 500000L
-
-
-            invoke.sign(seed)
-
-
-            val args = mutableListOf(
-                InvokeScriptTransaction.Arg("string", "Some string!"),
-                InvokeScriptTransaction.Arg("integer", 128L),
-                InvokeScriptTransaction.Arg("integer", -127L),
-                InvokeScriptTransaction.Arg("boolean", true),
-                InvokeScriptTransaction.Arg("boolean", false),
-                InvokeScriptTransaction.Arg("binary", "base64:VGVzdA=="))
 
             val call = InvokeScriptTransaction.Call(
-                function = "deposit",
+                function = "feed",
                 args = mutableListOf()
             )
 
             val payment = mutableListOf(
                 InvokeScriptTransaction.Payment(
                     assetId = null,
-                    amount = 1L))
+                    amount = 100000L))
 
             val transaction = InvokeScriptTransaction(
-                dApp = "3N5MStpzr7huB376SNGpMGCMKet8JmwF42e",
+                dApp = "3N7cKXykq32Xk6z4jSbECdcjyswJy84iSLZ",
                 call = call,
                 payment = payment)
 
@@ -150,57 +131,6 @@ class MainActivity : AppCompatActivity() {
                     // Do something on fail
                 })
 
-            val transferTransaction = TransferTransaction(
-                assetId = WavesConstants.WAVES_ASSET_ID_EMPTY,
-                recipient = "3N7qQ4adk68s2cqRnUzHFRPQB2JX1CPxhcN",
-                amount = 1,
-                feeAssetId = WavesConstants.WAVES_ASSET_ID_EMPTY)
-            transferTransaction.fee = 900000
-            // Sign transaction with seedWavesCrypto.base58decode(senderPublicKey),
-            transferTransaction.sign(seed)
-
-            // Try to send transaction into Waves blockchainTransferTransaction
-
-//            WavesSdk.service().getNode().transactionsBroadcast(transferTransaction)
-//                .compose(RxUtil.applyObservableDefaultSchedulers())
-//                .subscribe({ response ->
-//                    Toast.makeText(
-//                        this@MainActivity,
-//                        "Transactions success",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                    // Do something on success, now we have wavesBalance.balance in satoshi in Long
-//                }, { error ->
-//                    Toast.makeText(
-//                        this@MainActivity,
-//                        "Erorr" + error.localizedMessage,
-//                        Toast.LENGTH_LONG
-//                    ).show()
-//                    // Do something on fail
-////                })
-//            WavesSdk.service()
-//                .getNode()
-//                .transactionsBroadcast(invoke)
-//                .compose(RxUtil.applyObservableDefaultSchedulers())
-//                .subscribe({ response ->
-//                    Toast.makeText(
-//                        this@MainActivity,
-//                        "EEE",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                .transactionsBroadcast(invoke)
-//                .compose(RxUtil.applyObservableDefaultSchedulers())
-//                .subscribe({ response ->
-//                    // Do something on success, now we have wavesBalance.balance in satoshi in Long
-//                }, { error ->
-//                    print(error.toString())
-//                    Toast.makeText(
-//                        this@MainActivity,
-//                        "Erorr" + error.toString(),
-//                        Toast.LENGTH_LONG
-//                    ).show()
-//                    // Do something on fail
-//                })
         }
 
         fab_d_app_sign.setOnClickListener {
