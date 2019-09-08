@@ -1,0 +1,32 @@
+{-# STDLIB_VERSION 3 #-}
+{-# CONTENT_TYPE DAPP #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+let fund = addressFromStringValue("")
+let piggyBank = addressFromStringValue("3N64tZ47Ra4Pw9uFCXHyaHMQznBrQvxg4sA")
+let price = 100000000 
+
+@Callable(i)
+func buy(animal:String) = {
+    let pmt = extract(i.payment)
+    if (isDefined(pmt.assetId)) then {
+
+        TransferSet([ScriptTransfer(piggyBank, pmt.amount, pmt.assetId)])
+    
+    } else if (pmt.amount < price) then {
+        throw("Not enough money to buy")
+    } else if (match getBoolean(this, animal) {
+                case b:Boolean => b 
+                case _ => false}) then {
+        throw("Already bought item")
+    } else {
+        let animalAddr = addressFromStringValue(animal)
+        ScriptResult(
+            WriteSet([DataEntry(animal, true)]),
+            TransferSet([ScriptTransfer(fund, pmt.amount, unit)])
+        )
+    }
+}
+
+@Verifier(tx)
+func verify() = false

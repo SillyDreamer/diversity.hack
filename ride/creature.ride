@@ -1,0 +1,57 @@
+{-# STDLIB_VERSION 3 #-}
+{-# CONTENT_TYPE DAPP #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+let hour = 60 * 60
+let starveToDeathTime = hour * 24 * 7
+let bankContract = addressFromStringValue("3N7qQ4adk68s2cqRnUzHFRPQB2JX1CPxhcN")
+let feedingContract = addressFromStringValue("3N7qQ4adk68s2cqRnUzHFRPQB2JX1CPxhcN")
+let piggyBank = addressFromStringValue("3N64tZ47Ra4Pw9uFCXHyaHMQznBrQvxg4sA")
+let type = "Cat"
+
+func normalizeTimestamp(timestamp:Int) = {
+    if (timestamp > starveToDeathTime) then {
+        starveToDeathTime
+    } else {
+        timestamp
+    }
+}
+
+func max(a:Int, b:Int) = if (a > b) then {a} else {b}
+
+@Callable(i)
+func feed() = {
+    let pmt = extract(i.payment)
+    let currentTimestamp = match blockInfoByHeight(extract(transactionHeightById(i.transactionId))) {
+        case bi:BlockInfo => bi.timestamp
+        case _ => throw()
+    }
+    let lastFeedingTimestamp = match getInteger(this, "last_feeding") {
+        case t:Int => t
+        case _ => currentTimestamp + starveToDeathTime / 2
+    }
+
+    if (lastFeedingTimestamp + starveToDeathTime < currentTimestamp) then {
+        throw("The creature is dead =(")
+    } else if (isDefined(pmt.assetId)) then {
+
+        TransferSet([ScriptTransfer(piggyBank, pmt.amount, pmt.assetId)])
+    
+    } else {
+        let feedingPrice = 100000 #getIntegerValue(feedingContract, "price_" + type)
+        if (pmt.amount < feedingPrice) then {
+            throw("Insuficient amount of Waves to feed the creature")
+        } else {
+#            let animalFund = addressFromStringValue(
+#                getStringValue( bankContract, "fund_" + type )
+#            )
+
+            let timestamp = max(currentTimestamp, lastFeedingTimestamp)
+            
+            ScriptResult(
+                WriteSet([DataEntry("last_feeding", normalizeTimestamp(timestamp))]),
+                TransferSet([ScriptTransfer(bankContract, pmt.amount, unit)])
+            )
+        }
+    }
+}

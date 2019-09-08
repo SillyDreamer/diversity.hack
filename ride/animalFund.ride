@@ -1,0 +1,39 @@
+{-# STDLIB_VERSION 3 #-}
+{-# CONTENT_TYPE DAPP #-}
+{-# SCRIPT_TYPE ACCOUNT #-}
+
+let defaultCommission = 3000
+let fund = addressFromStringValue("")
+let dev = addressFromStringValue("")
+
+func getCommission() = match getInteger(this, "commission") {
+    case val:Int => val
+    case _ => defaultCommission
+}
+
+@Callable(i)
+func changeCommission(newVal:Int) = {
+    if (i.caller != dev) then {
+        throw()
+    } else {
+        let oldVal = getCommission()
+        if (newVal < oldVal && newVal >= 0) then {
+            WriteSet([DataEntry("commission", newVal)])
+        } else {
+            throw()
+        }
+    }
+}
+
+@Callable(i)
+func transfer() = {
+    let balance = wavesBalance(this)
+    let toFund = balance * (10000 - getCommission()) / 10000
+    let commission = balance - toFund
+    TransferSet([
+        ScriptTransfer(fund, toFund, unit),
+        ScriptTransfer(dev, commission, unit)])
+}
+
+@Verifier(tx)
+func verify() = false
