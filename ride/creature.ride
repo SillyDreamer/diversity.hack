@@ -22,18 +22,7 @@ func max(a:Int, b:Int) = if (a > b) then {a} else {b}
 @Callable(i)
 func feed() = {
     let pmt = extract(i.payment)
-    let currentTimestamp = match blockInfoByHeight(extract(transactionHeightById(i.transactionId))) {
-        case bi:BlockInfo => bi.timestamp
-        case _ => throw()
-    }
-    let lastFeedingTimestamp = match getInteger(this, "last_feeding") {
-        case t:Int => t
-        case _ => currentTimestamp + starveToDeathTime / 2
-    }
-
-    if (lastFeedingTimestamp + starveToDeathTime < currentTimestamp) then {
-        throw("The creature is dead =(")
-    } else if (isDefined(pmt.assetId)) then {
+    if (isDefined(pmt.assetId)) then {
 
         TransferSet([ScriptTransfer(piggyBank, pmt.amount, pmt.assetId)])
     
